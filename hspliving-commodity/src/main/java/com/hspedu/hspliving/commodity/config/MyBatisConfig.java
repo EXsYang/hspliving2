@@ -41,7 +41,6 @@ public class MyBatisConfig {
         // - `getDataList()` 方法是前端发起分页查询请求的方法。它通过 HTTP GET 请求传递分页参数（页码、每页显示数量等）给后端。后端根据这些参数执行分页查询，并返回分页结果。
         //
         // **总结**：在分页查询中，无论指定的页码是否超出实际页数，MyBatis Plus 和前端逻辑都会合理处理，确保用户界面上的分页显示与实际数据相匹配，从而提供良好的用户体验。
-
         // 是的，`paginationInterceptor.setOverflow(true);` 这个设置和你提到的问题确实有关。
         //
         // 当设置 `paginationInterceptor.setOverflow(true);` 时，它告诉 MyBatis Plus 的分页插件在当前页码超出总页数时自动跳转回第一页。这就是“溢出”行为的处理：如果请求的页码超过了实际存在的最大页码，查询将不会返回空结果，而是返回第一页的内容。
@@ -56,20 +55,14 @@ public class MyBatisConfig {
         /*
         上面这个设置会改变 响应体中currPage的值，如果超出 就返回第一页 会将"currPage"设置为1
         比如请求到的数据只有一条记录，但是要显示的页码却为 page=2 ,此时按理说currPage=2，但是却被修改为"currPage":1
-
         你的理解几乎是正确的，但有一点需要澄清。设置 `paginationInterceptor.setOverflow(true);` 主要影响的是请求页码超出实际页数时的行为。具体到 `currPage` 或类似的分页响应参数，这取决于分页插件的具体实现和如何构建分页响应。
-
         1. 如果设置了 `.setOverflow(true)`，并且请求的页码超过了实际的总页数，那么系统行为是这样的：
             - **查询行为**：分页查询会返回第一页的数据而不是一个空页。
             - **分页响应**：通常，响应体中的当前页 (`currPage` 或类似命名) 应反映实际返回的页码。在这种情况下，如果请求的页码超过了总页数，并且由于 `overflow` 设置为 `true`，返回了第一页的数据，`currPage` 应该会被设置为 `1`。
-
         2. 在没有设置 `.setOverflow(true)` 的情况下：
             - **查询行为**：如果请求的页码超过总页数，分页查询通常会返回一个空的结果集。
             - **分页响应**：在这种情况下，响应体中的 `currPage` 通常会保持为请求的页码，即使那一页实际上没有数据。
-
         因此，你的描述是正确的，但需要注意的是，具体的 `currPage` 值和是否修改它取决于你的分页响应构建逻辑。如果你使用的是 MyBatis Plus 的分页插件并且启用了 `overflow`，且实际业务逻辑在请求页码超出总页数时返回第一页的数据，那么在这种情况下 `currPage` 确实应该反映为 `1`。这样做是为了保持响应体中的数据和状态与实际返回的分页数据一致。
-
-
          响应体: {"msg":"success","code":0,"page":{"totalCount":1,"pageSize":2,"totalPage":1,"currPage":1,"list":[{"id":3,"name":"功能","sort":0,"description":"功能说明","icon":"","categoryId":301}]}}
          */
 

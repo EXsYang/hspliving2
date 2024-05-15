@@ -31,8 +31,9 @@ public class SpuInfoDescEntity implements Serializable {
 	 * 指定主键生成策略：通过注解的 type 属性来指定如何生成主键的值。
 	 * @TableId 注解的使用
 	 * 没有指定 type 属性：当你只写 @TableId 而没有指定 type 属性时，MyBatis Plus 会使用全局的主键生成策略。这个策略默认是 IdType.NONE（即不自动增长），但可以在配置文件中被覆盖。
-	 *
+	 * @TableId 注解中指定的 type 属性具有最高的优先级。当你在实体类的字段上使用 @TableId(type = IdType.INPUT) 时，无论在全局配置中如何设置 id-type，都将以实体类上的注解为准。这是因为注解直接关联到了具体的字段，而全局配置则是一个更广泛的设置，适用于没有特别指定生成策略的场景。
 	 * 指定 type = IdType.INPUT：这表明你打算“手动”输入主键的值，而不是依赖数据库的自增长特性或者 MyBatis Plus 的其他主键生成策略来自动生成这个值。在某些情况下，比如你希望使用另一个表的 ID 作为当前表的主键，或者你有自己的主键生成逻辑，这种方式非常有用。
+	 *
 	 */
 	/**
 	 * 商品 id
@@ -44,8 +45,11 @@ public class SpuInfoDescEntity implements Serializable {
 	 * 2. 而是我们添加SpuInfoDescEntity对象时配置的id,即与表commodity_spu_info的id字段关联
 	 */
 	// @TableId
-	@TableId(type = IdType.INPUT)
+	@TableId(type = IdType.INPUT) // @TableId 注解中指定的 type 属性具有最高的优先级，会覆盖 application.yml 中全局配置的 id-type 设置。
+// 这种覆盖仅限于此字段（spuId），即此注解明确指定了主键生成策略（IdType.INPUT），要求手动指定主键值。
+// 对于未在 @TableId 注解中指定具体 IdType 的其他实体属性，将默认使用 application.yml 中配置的全局 id-type（如 auto），这通常意味着自增主键。
 	private Long spuId;
+
 	/**
 	 * 商品介绍图片
 	 */

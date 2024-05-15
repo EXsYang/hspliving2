@@ -69,6 +69,9 @@ public class BrandController {
      * http://localhost:9090/commodity/brand/save
      * <p>
      * 1. @Validated 注解的作用就是启用 BrandEntity 字段上添加的校验
+     *    注解@Validated 是由Spring框架提供的，
+     *    作为@Valid的一个增强版，支持分组功能！！！ @Valid 注解不支持验证分组功能
+     *
      * 2. 在这里的控制器接口方法上，如果没有写 @Validated 注解 ，这个校验规则不生效
      * 3. BindingResult result: SpringBoot 会将校验的错误放入到 result
      * 4. 程序员可以通过 BindingResult result 将校验得到的错误取出，然后进行相应的操作
@@ -79,6 +82,32 @@ public class BrandController {
      * 7. @Validated(SaveGroup.class) 表示调用save方法时，进行参数校验, 使用的是SaveGroup的校验规则
      *
      * http://localhost:9090/commodity/brand/save
+     */
+    /**
+     * 保存品牌信息。使用分组校验来确保传入的BrandEntity对象满足特定的校验规则。
+     *
+     * @param brand 品牌实体对象，将从请求体中自动绑定JSON数据到该对象。
+     * @return 根据操作结果返回相应的响应实体。
+     *
+     * 校验和数据处理流程：
+     * 1. @Validated(SaveGroup.class)：启用SaveGroup分组的校验规则，只校验分组内指定的字段。
+     * 2. @RequestBody：自动将入参JSON转换为BrandEntity对象。
+     * 3. 如果有校验错误（若未使用BindingResult参数）：
+     *    - 校验失败会导致Spring自动抛出MethodArgumentNotValidException。
+     *    - MethodArgumentNotValidException是BindException的子类，包含了具体的校验失败信息，如字段错误等。
+     *    - 异常将被全局异常处理器捕捉并处理，异常处理器会根据异常类型返回给前端相应的错误信息。
+     *
+     * 示例未使用BindingResult的情况下：
+     * - 无校验错误时：执行业务逻辑，如保存品牌信息到数据库。
+     * - 有校验错误时：MethodArgumentNotValidException异常（BindException的子类）将被全局异常处理器捕捉并处理，
+     *   返回给前端具体的字段校验错误信息。
+     *
+     * 使用BindingResult可以提供的处理方式（当前被注释）：
+     * - 创建一个map来收集和返回具体的字段错误信息。
+     * - 如果有错误，遍历BindingResult中的错误，收集字段名和对应错误消息，返回错误响应。
+     * - 如果无错误，继续执行业务逻辑，如数据入库。
+     *
+     * @RequiresPermissions("commodity:brand:save") // Uncomment to enable Shiro permission check
      */
     @RequestMapping("/save")
     // @RequiresPermissions("commodity:brand:save")
